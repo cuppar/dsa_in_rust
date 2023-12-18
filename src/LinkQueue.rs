@@ -1,4 +1,4 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, rc::Rc, vec};
 
 pub struct LinkQueue<T> {
     front: Option<Link<T>>,
@@ -19,7 +19,7 @@ impl<T> Node<T> {
     }
 }
 
-impl<T> LinkQueue<T> {
+impl<T: Clone> LinkQueue<T> {
     pub fn new() -> Self {
         LinkQueue {
             front: None,
@@ -66,6 +66,19 @@ impl<T> LinkQueue<T> {
     pub fn size(&self) -> usize {
         self.size
     }
+
+    pub fn to_vec(&self) -> Vec<T> {
+        self._to_vec(self.front.as_ref())
+    }
+
+    fn _to_vec(&self, head: Option<&Link<T>>) -> Vec<T> {
+        if let Some(head) = head {
+            let mut rest = self._to_vec(head.borrow().next.as_ref());
+            rest.insert(0, head.borrow().val.clone());
+            return rest;
+        }
+        vec![]
+    }
 }
 
 #[cfg(test)]
@@ -82,12 +95,16 @@ mod tests {
         assert_eq!(queue.size(), 3);
         assert!(!queue.is_empty());
 
+        assert_eq!(queue.to_vec(), [1, 2, 3]);
+
         assert_eq!(&queue.peek().unwrap().borrow().val, &1);
         assert_eq!(queue.pop(), Some(1));
         assert_eq!(&queue.peek().unwrap().borrow().val, &2);
         assert_eq!(queue.pop(), Some(2));
         assert_eq!(&queue.peek().unwrap().borrow().val, &3);
         assert_eq!(queue.pop(), Some(3));
+        assert_eq!(queue.pop(), None);
+        assert_eq!(queue.pop(), None);
 
         assert_eq!(queue.size(), 0);
         assert!(queue.is_empty());
