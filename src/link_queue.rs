@@ -1,10 +1,12 @@
 use std::{
     cell::{Ref, RefCell},
+    fmt::Debug,
     rc::Rc,
     vec,
 };
 
-pub struct LinkQueue<T> {
+#[derive(Debug)]
+pub struct LinkQueue<T: Debug> {
     front: Option<Link<T>>,
     rear: Option<Link<T>>,
     size: usize,
@@ -12,18 +14,19 @@ pub struct LinkQueue<T> {
 
 type Link<T> = Rc<RefCell<Node<T>>>;
 
-struct Node<T> {
+#[derive(Debug)]
+struct Node<T: Debug> {
     val: T,
     next: Option<Link<T>>,
 }
 
-impl<T> Node<T> {
+impl<T: Debug> Node<T> {
     fn new(val: T) -> Link<T> {
         Rc::new(RefCell::new(Node { val, next: None }))
     }
 }
 
-impl<T: Clone> LinkQueue<T> {
+impl<T: Clone + Debug> LinkQueue<T> {
     pub fn new() -> Self {
         LinkQueue {
             front: None,
@@ -55,7 +58,12 @@ impl<T: Clone> LinkQueue<T> {
                 }
             }
             self.size -= 1;
-            Rc::try_unwrap(old_front).ok().unwrap().into_inner().val
+            Rc::try_unwrap(old_front)
+                .ok()
+                .unwrap()
+                .into_inner()
+                .val
+                .clone()
         })
     }
 
@@ -84,6 +92,31 @@ impl<T: Clone> LinkQueue<T> {
             return rest;
         }
         vec![]
+    }
+}
+
+impl<T: Debug> Drop for Node<T> {
+    fn drop(&mut self) {
+        println!("Before drop node: {:?}", self.val);
+        drop(self.next.take());
+        println!("After drop node: {:?}", self.val);
+    }
+}
+
+impl<T: Debug> Drop for LinkQueue<T> {
+    fn drop(&mut self) {
+        let mut cur_node = self.front.take();
+        while let Some(node) = cur_node {
+            if let Ok(node) = Rc::try_unwrap(node) {
+                cur_node = node.borrow_mut().next.take();
+                // node go out of scope
+            } else {
+                // cur point to last node which `rear` point to, too.
+                // last node will drop when `rear` go out of scope.
+                break;
+                // node go out of scope
+            }
+        }
     }
 }
 

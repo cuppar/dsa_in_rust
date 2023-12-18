@@ -64,6 +64,16 @@ impl<T: Clone> LinkStack<T> {
     }
 }
 
+impl<T> Drop for LinkStack<T> {
+    fn drop(&mut self) {
+        let mut cur_node = self.top.take();
+        while let Some(mut node) = cur_node {
+            cur_node = node.next.take()
+            // node go out of scope
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
