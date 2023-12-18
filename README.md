@@ -1,1 +1,2 @@
-# dsa_in_rust
+# Data Structures and Algorithms in Rust
+
