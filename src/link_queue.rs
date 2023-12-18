@@ -1,4 +1,8 @@
-use std::{cell::RefCell, rc::Rc, vec};
+use std::{
+    cell::{Ref, RefCell},
+    rc::Rc,
+    vec,
+};
 
 pub struct LinkQueue<T> {
     front: Option<Link<T>>,
@@ -55,8 +59,10 @@ impl<T: Clone> LinkQueue<T> {
         })
     }
 
-    pub fn peek(&self) -> Option<&Link<T>> {
-        self.front.as_ref()
+    pub fn peek(&self) -> Option<Ref<'_, T>> {
+        self.front
+            .as_ref()
+            .map(|node| Ref::map(node.borrow(), |node| &node.val))
     }
 
     pub fn is_empty(&self) -> bool {
@@ -97,11 +103,11 @@ mod tests {
 
         assert_eq!(queue.to_vec(), [1, 2, 3]);
 
-        assert_eq!(&queue.peek().unwrap().borrow().val, &1);
+        assert_eq!(*queue.peek().unwrap(), 1);
         assert_eq!(queue.pop(), Some(1));
-        assert_eq!(&queue.peek().unwrap().borrow().val, &2);
+        assert_eq!(*queue.peek().unwrap(), 2);
         assert_eq!(queue.pop(), Some(2));
-        assert_eq!(&queue.peek().unwrap().borrow().val, &3);
+        assert_eq!(*queue.peek().unwrap(), 3);
         assert_eq!(queue.pop(), Some(3));
         assert_eq!(queue.pop(), None);
         assert_eq!(queue.pop(), None);
