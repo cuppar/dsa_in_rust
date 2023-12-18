@@ -1,5 +1,3 @@
-use std::{cell::RefCell, rc::Rc, result};
-
 pub struct ArrayStack<T> {
     array: Vec<T>,
     top: usize,
