@@ -204,4 +204,55 @@ mod tests {
 
         assert!(deque.is_empty());
     }
+
+    #[test]
+    fn all() {
+        let mut deque = LinkDeque::new();
+        deque.push_front(3);
+        deque.push_front(2);
+        deque.push_front(1);
+        deque.push_rear(4);
+        deque.push_rear(5);
+        deque.push_rear(6);
+
+        assert!(!deque.is_empty());
+
+        assert_eq!(deque.to_vec(), [1, 2, 3, 4, 5, 6]);
+
+        assert_eq!(*deque.peek_front().unwrap(), 1);
+        assert_eq!(*deque.peek_rear().unwrap(), 6);
+
+        assert_eq!(deque.pop_front(), Some(1));
+        assert_eq!(deque.pop_front(), Some(2));
+        assert_eq!(deque.pop_front(), Some(3));
+        assert_eq!(deque.pop_front(), Some(4));
+
+        assert!(!deque.is_empty());
+
+        assert_eq!(deque.to_vec(), [5, 6]);
+
+        assert_eq!(*deque.peek_front().unwrap(), 5);
+        assert_eq!(*deque.peek_rear().unwrap(), 6);
+
+        deque.push_rear(7);
+        deque.push_rear(8);
+        deque.push_front(4);
+        deque.push_front(3);
+
+        assert!(!deque.is_empty());
+
+        assert_eq!(deque.to_vec(), [3, 4, 5, 6, 7, 8]);
+
+        assert_eq!(*deque.peek_front().unwrap(), 3);
+        assert_eq!(*deque.peek_rear().unwrap(), 8);
+
+        assert_eq!(deque.pop_rear(), Some(8));
+        assert_eq!(deque.pop_rear(), Some(7));
+        assert_eq!(deque.pop_rear(), Some(6));
+        assert_eq!(deque.pop_rear(), Some(5));
+        assert_eq!(deque.pop_rear(), Some(4));
+        assert_eq!(deque.pop_rear(), Some(3));
+
+        assert!(deque.is_empty());
+    }
 }
