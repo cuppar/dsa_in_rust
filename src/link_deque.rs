@@ -133,6 +133,7 @@ impl<T: Clone + Debug> LinkDeque<T> {
 impl<T: Debug> Drop for Node<T> {
     fn drop(&mut self) {
         println!("Before drop node: {:?}", self.val);
+        drop(self.prev.take());
         drop(self.next.take());
         println!("After drop node: {:?}", self.val);
     }
