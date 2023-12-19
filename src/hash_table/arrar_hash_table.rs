@@ -1,13 +1,11 @@
 use std::fmt::Debug;
 
-/* 键值对 */
 #[derive(Debug, Clone, PartialEq)]
 pub struct Pair<V: Clone + Debug> {
     pub key: usize,
     pub val: V,
 }
 
-/* 基于数组实现的哈希表 */
 pub struct ArrayHashMap<V: Clone + Debug> {
     buckets: Vec<Option<Pair<V>>>,
 }
@@ -21,35 +19,29 @@ impl<V: Clone + Debug> ArrayHashMap<V> {
         }
     }
 
-    /* 哈希函数 */
     fn hash_func(&self, key: usize) -> usize {
         key % BUCKETS_SIZE
     }
 
-    /* 查询操作 */
     pub fn get(&self, key: usize) -> Option<&V> {
         let idx = self.hash_func(key);
         self.buckets[idx].as_ref().map(|p| &p.val)
     }
 
-    /* 添加操作 */
     pub fn put(&mut self, key: usize, val: V) {
         let idx = self.hash_func(key);
         self.buckets[idx] = Some(Pair { key, val });
     }
 
-    /* 删除操作 */
     pub fn remove(&mut self, key: usize) {
         let idx = self.hash_func(key);
         self.buckets[idx].take();
     }
 
-    /* 获取所有键值对 */
     pub fn entry_set(&self) -> Vec<&Pair<V>> {
         self.buckets.iter().filter_map(|p| p.as_ref()).collect()
     }
 
-    /* 获取所有键 */
     pub fn key_set(&self) -> Vec<usize> {
         self.buckets
             .iter()
@@ -57,7 +49,6 @@ impl<V: Clone + Debug> ArrayHashMap<V> {
             .collect()
     }
 
-    /* 获取所有值 */
     pub fn value_set(&self) -> Vec<&V> {
         self.buckets
             .iter()
@@ -65,7 +56,6 @@ impl<V: Clone + Debug> ArrayHashMap<V> {
             .collect()
     }
 
-    /* 打印哈希表 */
     pub fn print(&self) {
         for p in self.entry_set() {
             println!("{} -> {:?}", p.key, p.val);
