@@ -62,6 +62,7 @@ impl<T: Clone + Debug + Ord> BinarySearchTree<T> {
             pre.borrow_mut().right = Some(new_node);
         }
     }
+
     pub fn insert_recursion(&mut self, val: T) {
         Self::_insert_recursion(&mut self.root, val);
     }
@@ -85,6 +86,83 @@ impl<T: Clone + Debug + Ord> BinarySearchTree<T> {
         } else {
             *root = Some(BinarySearchTreeNode::new(val))
         }
+    }
+
+    pub fn search_iterate(&self, val: T) -> Option<Edge<T>> {
+        let mut cur = self.root.clone();
+
+        while let Some(node) = cur.clone() {
+            use std::cmp::Ordering::*;
+            match node.borrow().val.cmp(&val) {
+                Less => {
+                    cur = node.borrow().right.clone();
+                }
+                Equal => return cur,
+                Greater => {
+                    cur = node.borrow().left.clone();
+                }
+            }
+        }
+
+        None
+    }
+
+    pub fn search_recursion(&self, val: T) -> Option<Edge<T>> {
+        Self::_search_recursion(&self.root, val)
+    }
+    pub fn _search_recursion(root: &Option<Edge<T>>, val: T) -> Option<Edge<T>> {
+        if let Some(node) = root {
+            use std::cmp::Ordering::*;
+            return match node.borrow().val.cmp(&val) {
+                Less => Self::_search_recursion(&node.borrow().right, val),
+                Equal => root.clone(),
+                Greater => Self::_search_recursion(&node.borrow().left, val),
+            };
+        }
+        None
+    }
+
+    pub fn remove_iterate(&mut self, val: T) {
+        let mut cur = self.root.clone();
+        let mut pre = None;
+
+        while let Some(node) = cur.clone() {
+            use std::cmp::Ordering::*;
+            match node.borrow().val.cmp(&val) {
+                Less => {
+                    pre = cur.clone();
+                    cur = node.borrow().right.clone();
+                }
+                Equal => break,
+                Greater => {
+                    pre = cur.clone();
+                    cur = node.borrow().left.clone();
+                }
+            }
+        }
+
+        if let Some(to_remove) = cur {
+            let (left_child, right_child) = (
+                to_remove.borrow().left.clone(),
+                to_remove.borrow().right.clone(),
+            );
+            match (left_child.clone(), right_child.clone()) {
+                (None, None) | (None, Some(_)) | (Some(_), None) => {
+                    let child = left_child.or(right_child);
+                    if let Some(pre) = pre {
+                        let left = pre.borrow().left.clone();
+                        if left.is_some() && Rc::ptr_eq(&left.unwrap(), &to_remove) {
+                            pre.borrow_mut().left = child;
+                        } else {
+                            pre.borrow_mut().right = child;
+                        }
+                    } else {
+                        self.root = child;
+                    }
+                }
+                (Some(_), Some(_)) => todo!(),
+            }
+        } // else cur is none and nothing to remove
     }
 
     pub fn print(&self) {
@@ -189,6 +267,10 @@ mod tests {
 
         tree.print();
 
+        assert_eq!(tree.search_iterate(1).unwrap().borrow().val, 1);
+        assert_eq!(tree.search_iterate(3).unwrap().borrow().val, 3);
+        assert!(tree.search_iterate(6).is_none());
+
         println!("Level order: {:?}", tree.level_order());
         println!("Pre order: {:?}", tree.pre_order());
         println!("In order: {:?}", tree.in_order());
@@ -207,6 +289,10 @@ mod tests {
         tree.insert_recursion(4);
 
         tree.print();
+
+        assert_eq!(tree.search_recursion(1).unwrap().borrow().val, 1);
+        assert_eq!(tree.search_recursion(3).unwrap().borrow().val, 3);
+        assert!(tree.search_recursion(6).is_none());
 
         println!("Level order: {:?}", tree.level_order());
         println!("Pre order: {:?}", tree.pre_order());
