@@ -182,6 +182,7 @@ impl<T: Clone + Debug + Ord> BinarySearchTree<T> {
         } // else cur is none and nothing to remove
     }
 
+    
     pub fn print(&self) {
         Self::_print(&self.root, 0, "Root: ");
     }
