@@ -1,4 +1,4 @@
-use std::{cell::RefCell, fmt::Debug, rc::Rc};
+use std::{cell::RefCell, collections::VecDeque, fmt::Debug, rc::Rc};
 
 pub struct BinaryTree<T: Clone + Debug> {
     root: Option<BinaryTreeEdge<T>>,
@@ -78,6 +78,64 @@ impl<T: Clone + Debug> BinaryTree<T> {
             println!("{}<None>", prefix);
         }
     }
+
+    pub fn level_order(&self) -> Vec<T> {
+        let mut result = vec![];
+        if let Some(root) = &self.root {
+            let mut que = VecDeque::new();
+            que.push_back(Rc::clone(root));
+
+            while let Some(node) = que.pop_front() {
+                result.push(node.borrow().val.clone());
+                if let Some(left) = node.borrow().left.as_ref() {
+                    que.push_back(Rc::clone(left));
+                }
+                if let Some(right) = node.borrow().right.as_ref() {
+                    que.push_back(Rc::clone(right));
+                }
+            }
+        }
+        result
+    }
+
+    pub fn pre_order(&self) -> Vec<T> {
+        let mut result = vec![];
+        Self::_pre_order(&self.root, &mut result);
+        result
+    }
+    fn _pre_order(node: &Option<BinaryTreeEdge<T>>, result: &mut Vec<T>) {
+        if let Some(node) = node {
+            result.push(node.borrow().val.clone());
+            Self::_pre_order(&node.borrow().left, result);
+            Self::_pre_order(&node.borrow().right, result);
+        }
+    }
+
+    pub fn in_order(&self) -> Vec<T> {
+        let mut result = vec![];
+        Self::_in_order(&self.root, &mut result);
+        result
+    }
+    fn _in_order(node: &Option<BinaryTreeEdge<T>>, result: &mut Vec<T>) {
+        if let Some(node) = node {
+            Self::_in_order(&node.borrow().left, result);
+            result.push(node.borrow().val.clone());
+            Self::_in_order(&node.borrow().right, result);
+        }
+    }
+
+    pub fn post_order(&self) -> Vec<T> {
+        let mut result = vec![];
+        Self::_post_order(&self.root, &mut result);
+        result
+    }
+    fn _post_order(node: &Option<BinaryTreeEdge<T>>, result: &mut Vec<T>) {
+        if let Some(node) = node {
+            Self::_post_order(&node.borrow().left, result);
+            Self::_post_order(&node.borrow().right, result);
+            result.push(node.borrow().val.clone());
+        }
+    }
 }
 
 #[cfg(test)]
@@ -119,5 +177,10 @@ mod tests {
         }
 
         tree.print();
+
+        println!("Level order: {:?}", tree.level_order());
+        println!("Pre order: {:?}", tree.pre_order());
+        println!("In order: {:?}", tree.in_order());
+        println!("Post order: {:?}", tree.post_order());
     }
 }
