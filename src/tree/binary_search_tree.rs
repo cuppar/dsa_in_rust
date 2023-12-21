@@ -122,8 +122,11 @@ impl<T: Clone + Debug + Ord> BinarySearchTree<T> {
         None
     }
 
-    pub fn remove_iterate(&mut self, val: T) {
-        let mut cur = self.root.clone();
+    pub fn remove(&mut self, val: T) {
+        Self::_remove(&mut self.root, val);
+    }
+    pub fn _remove(root: &mut Option<Edge<T>>, val: T) {
+        let mut cur = root.clone();
         let mut pre = None;
 
         while let Some(node) = cur.clone() {
@@ -157,10 +160,24 @@ impl<T: Clone + Debug + Ord> BinarySearchTree<T> {
                             pre.borrow_mut().right = child;
                         }
                     } else {
-                        self.root = child;
+                        *root = child;
                     }
                 }
-                (Some(_), Some(_)) => todo!(),
+                (Some(_), Some(_)) => {
+                    let mut to_change = to_remove.borrow().right.clone();
+                    while let Some(node) = to_change.clone() {
+                        if node.borrow().left.is_none() {
+                            break;
+                        } else {
+                            to_change = node.borrow().left.clone();
+                        }
+                    }
+
+                    let to_change_val = to_change.unwrap().borrow().val.clone();
+                    Self::_remove(&mut Some(to_remove.clone()), to_change_val.clone());
+
+                    to_remove.borrow_mut().val = to_change_val;
+                }
             }
         } // else cur is none and nothing to remove
     }
@@ -267,8 +284,11 @@ mod tests {
 
         tree.print();
 
+        tree.remove(3);
+        tree.print();
+
         assert_eq!(tree.search_iterate(1).unwrap().borrow().val, 1);
-        assert_eq!(tree.search_iterate(3).unwrap().borrow().val, 3);
+        assert!(tree.search_iterate(3).is_none());
         assert!(tree.search_iterate(6).is_none());
 
         println!("Level order: {:?}", tree.level_order());
