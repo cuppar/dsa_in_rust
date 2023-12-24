@@ -112,6 +112,30 @@ impl<T: Debug + Eq + Hash + Clone> GraphAdjList<T> {
 
         result
     }
+
+    pub fn dfs(&self) -> Vec<T> {
+        let mut res = vec![];
+        if let Some(first) = self.adj_list.keys().nth(0) {
+            let mut visited = HashSet::new();
+            self._dfs(&mut res, &mut visited, first);
+        }
+        res
+    }
+
+    fn _dfs<'a>(&'a self, res: &mut Vec<T>, visited: &mut HashSet<&'a T>, start_vertex: &'a T) {
+        res.push(start_vertex.clone());
+        visited.insert(start_vertex);
+
+        if let Some(adj_list) = self.adj_list.get(&start_vertex) {
+            for adj in adj_list {
+                if visited.contains(adj) {
+                    continue;
+                }
+
+                self._dfs(res, visited, adj);
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -130,5 +154,6 @@ mod tests {
         graph.print();
 
         println!("bfs: {:?}", graph.bfs());
+        println!("dfs: {:?}", graph.dfs());
     }
 }

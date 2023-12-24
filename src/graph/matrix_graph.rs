@@ -112,6 +112,34 @@ impl<T: Debug + Eq + Hash + Clone> GraphAdjMatrix<T> {
 
         result
     }
+
+    pub fn dfs(&self) -> Vec<T> {
+        let mut res = vec![];
+        let mut visited = HashSet::new();
+        self._dfs(&mut res, &mut visited, 0);
+        res
+    }
+
+    fn _dfs(&self, res: &mut Vec<T>, visited: &mut HashSet<usize>, start_vertex: usize) {
+        if start_vertex >= self.vertices.len() {
+            return;
+        }
+
+        res.push(self.vertices[start_vertex].clone());
+        visited.insert(start_vertex);
+
+        for (adj, _) in self.adj_mat[start_vertex]
+            .iter()
+            .enumerate()
+            .filter(|(_, v)| **v != 0)
+        {
+            if visited.contains(&adj) {
+                continue;
+            }
+
+            self._dfs(res, visited, adj);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -133,5 +161,6 @@ mod tests {
         graph.print();
 
         println!("bfs: {:?}", graph.bfs());
+        println!("dfs: {:?}", graph.dfs());
     }
 }
