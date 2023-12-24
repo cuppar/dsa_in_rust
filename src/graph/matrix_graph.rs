@@ -1,11 +1,15 @@
-use std::fmt::Debug;
+use std::{
+    collections::{HashSet, VecDeque},
+    fmt::Debug,
+    hash::Hash,
+};
 
-pub struct GraphAdjMatrix<T: Debug> {
+pub struct GraphAdjMatrix<T: Debug + Eq + Hash + Clone> {
     pub vertices: Vec<T>,
     pub adj_mat: Vec<Vec<i32>>,
 }
 
-impl<T: Debug> GraphAdjMatrix<T> {
+impl<T: Debug + Eq + Hash + Clone> GraphAdjMatrix<T> {
     pub fn new(vertices: Vec<T>, edges: Vec<[usize; 2]>) -> Self {
         let mut graph = Self {
             vertices: vec![],
@@ -75,6 +79,39 @@ impl<T: Debug> GraphAdjMatrix<T> {
         }
         println!("]")
     }
+
+    pub fn bfs(&self) -> Vec<T> {
+        let mut result = vec![];
+        if self.size() == 0 {
+            return result;
+        }
+
+        let mut que = VecDeque::new();
+        que.push_back(0);
+
+        let mut visited = HashSet::new();
+        visited.insert(0);
+
+        while !que.is_empty() {
+            let idx = que.pop_front().unwrap();
+            result.push(self.vertices[idx].clone());
+
+            for (adj, _) in self.adj_mat[idx]
+                .iter()
+                .enumerate()
+                .filter(|(_, val)| **val != 0)
+            {
+                if visited.contains(&adj) {
+                    continue;
+                }
+
+                que.push_back(adj);
+                visited.insert(adj);
+            }
+        }
+
+        result
+    }
 }
 
 #[cfg(test)]
@@ -94,5 +131,7 @@ mod tests {
 
         graph.add_edge(4, 5);
         graph.print();
+
+        println!("bfs: {:?}", graph.bfs());
     }
 }

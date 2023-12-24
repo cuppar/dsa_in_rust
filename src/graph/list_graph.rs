@@ -1,4 +1,8 @@
-use std::{collections::HashMap, fmt::Debug, hash::Hash};
+use std::{
+    collections::{HashMap, HashSet, VecDeque},
+    fmt::Debug,
+    hash::Hash,
+};
 
 pub struct GraphAdjList<T: Debug + Eq + Hash + Clone> {
     pub adj_list: HashMap<T, Vec<T>>,
@@ -78,6 +82,36 @@ impl<T: Debug + Eq + Hash + Clone> GraphAdjList<T> {
             println!("{:?}: {:?},", vertex, list);
         }
     }
+
+    pub fn bfs(&self) -> Vec<T> {
+        let mut result = vec![];
+        if self.size() == 0 {
+            return result;
+        }
+
+        let first = self.adj_list.keys().nth(0).unwrap();
+        let mut que = VecDeque::new();
+        que.push_back(first);
+
+        let mut visited = HashSet::new();
+        visited.insert(first);
+
+        while !que.is_empty() {
+            let vertex = que.pop_front().unwrap();
+            result.push(vertex.clone());
+
+            for adj in self.adj_list.get(vertex).unwrap() {
+                if visited.contains(adj) {
+                    continue;
+                }
+
+                que.push_back(adj);
+                visited.insert(adj);
+            }
+        }
+
+        result
+    }
 }
 
 #[cfg(test)]
@@ -94,5 +128,7 @@ mod tests {
 
         graph.add_edge(4, 6);
         graph.print();
+
+        println!("bfs: {:?}", graph.bfs());
     }
 }
