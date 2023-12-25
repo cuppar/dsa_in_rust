@@ -4,15 +4,18 @@ pub fn quick_sort(mut nums: Vec<i32>) -> Vec<i32> {
     nums
 }
 
-fn _quick_sort(nums: &mut Vec<i32>, left: i32, right: i32) {
-    if left >= right {
-        return;
+fn _quick_sort(nums: &mut Vec<i32>, mut left: i32, mut right: i32) {
+    while left < right {
+        let pivot = partition(nums, left as usize, right as usize) as i32;
+
+        if pivot - left < right - pivot {
+            _quick_sort(nums, left, pivot - 1);
+            left = pivot + 1;
+        } else {
+            _quick_sort(nums, pivot + 1, right);
+            right = pivot - 1;
+        }
     }
-
-    let pivot = partition(nums, left as usize, right as usize) as i32;
-
-    _quick_sort(nums, left, pivot - 1);
-    _quick_sort(nums, pivot + 1, right);
 }
 
 fn partition(nums: &mut Vec<i32>, left: usize, right: usize) -> usize {
