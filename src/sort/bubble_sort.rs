@@ -1,18 +1,17 @@
-pub fn select_sort(mut nums: Vec<i32>) -> Vec<i32> {
+pub fn bubble_sort(mut nums: Vec<i32>) -> Vec<i32> {
     let n = nums.len();
-    if n < 2 {
-        return nums;
-    }
 
-    for i in 0..n - 1 {
-        let mut k = i;
-        for j in i + 1..n {
-            if nums[j] < nums[k] {
-                k = j;
+    for j in (1..n).rev() {
+        let mut exchanged = false;
+        for i in 0..j {
+            if nums[i] > nums[i + 1] {
+                swap(&mut nums, i, i + 1);
+                exchanged = true;
             }
         }
-
-        swap(&mut nums, i, k);
+        if !exchanged {
+            break;
+        }
     }
     nums
 }
@@ -37,12 +36,12 @@ mod tests {
     fn init() {
         let nums = vec![6, 4, 2, 9, 4, 8, 1, 3, 7, 2, 3, 5];
 
-        let nums = select_sort(nums);
+        let nums = bubble_sort(nums);
 
         assert_eq!(nums, vec![1, 2, 2, 3, 3, 4, 4, 5, 6, 7, 8, 9]);
 
         let nums = vec![];
-        let nums = select_sort(nums);
+        let nums = bubble_sort(nums);
         assert_eq!(nums, vec![]);
     }
 }
