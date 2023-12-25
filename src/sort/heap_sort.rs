@@ -1,15 +1,14 @@
 pub fn heap_sort(mut nums: Vec<i32>) -> Vec<i32> {
-    if nums.is_empty() {
-        return nums;
-    }
-    let n = nums.len();
+    let n = nums.len() as i32;
+
     for i in (0..=(n - 1) / 2).rev() {
-        sift_down(&mut nums, n, i);
+        sift_down(&mut nums, n as usize, i as usize);
     }
 
     for i in (1..n).rev() {
-        (nums[i], nums[0]) = (nums[0], nums[i]);
-        sift_down(&mut nums, i, 0);
+        (nums[i as usize], nums[0]) = (nums[0], nums[i as usize]);
+
+        sift_down(&mut nums, i as usize, 0);
     }
 
     nums
@@ -17,9 +16,6 @@ pub fn heap_sort(mut nums: Vec<i32>) -> Vec<i32> {
 
 fn sift_down(nums: &mut [i32], n: usize, mut i: usize) {
     loop {
-        if i >= n {
-            return;
-        }
         let (l, r, mut max) = (2 * i + 1, 2 * i + 2, i);
 
         if l < n && nums[l] > nums[max] {
@@ -31,9 +27,7 @@ fn sift_down(nums: &mut [i32], n: usize, mut i: usize) {
         if max == i {
             break;
         }
-
         (nums[max], nums[i]) = (nums[i], nums[max]);
-
         i = max;
     }
 }

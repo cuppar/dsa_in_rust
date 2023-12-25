@@ -1,11 +1,12 @@
 pub fn bubble_sort(mut nums: Vec<i32>) -> Vec<i32> {
     let n = nums.len();
 
-    for j in (1..n).rev() {
+    // [0, i] will be process
+    for i in (1..n).rev() {
         let mut exchanged = false;
-        for i in 0..j {
-            if nums[i] > nums[i + 1] {
-                swap(&mut nums, i, i + 1);
+        for j in 0..i {
+            if nums[j] > nums[j + 1] {
+                (nums[j], nums[j + 1]) = (nums[j + 1], nums[j]);
                 exchanged = true;
             }
         }
@@ -13,19 +14,8 @@ pub fn bubble_sort(mut nums: Vec<i32>) -> Vec<i32> {
             break;
         }
     }
-    nums
-}
 
-fn swap(nums: &mut [i32], i: usize, j: usize) {
-    let n = nums.len();
-    if i >= n || j >= n {
-        panic!("our of index");
-    }
-    if i != j {
-        let (max, min) = (i.max(j), i.min(j));
-        let (left, right) = nums.split_at_mut(max);
-        std::mem::swap(&mut left[min], &mut right[0]);
-    }
+    nums
 }
 
 #[cfg(test)]

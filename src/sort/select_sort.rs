@@ -1,32 +1,15 @@
 pub fn select_sort(mut nums: Vec<i32>) -> Vec<i32> {
-    let n = nums.len();
-    if n < 2 {
-        return nums;
-    }
-
+    let n = nums.len() as i32;
     for i in 0..n - 1 {
-        let mut k = i;
+        let mut min = i;
         for j in i + 1..n {
-            if nums[j] < nums[k] {
-                k = j;
+            if nums[j as usize] < nums[min as usize] {
+                min = j;
             }
         }
-
-        swap(&mut nums, i, k);
+        (nums[min as usize], nums[i as usize]) = (nums[i as usize], nums[min as usize]);
     }
     nums
-}
-
-fn swap(nums: &mut [i32], i: usize, j: usize) {
-    let n = nums.len();
-    if i >= n || j >= n {
-        panic!("our of index");
-    }
-    if i != j {
-        let (max, min) = (i.max(j), i.min(j));
-        let (left, right) = nums.split_at_mut(max);
-        std::mem::swap(&mut left[min], &mut right[0]);
-    }
 }
 
 #[cfg(test)]

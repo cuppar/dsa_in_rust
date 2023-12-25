@@ -1,17 +1,16 @@
 pub fn merge_sort(mut nums: Vec<i32>) -> Vec<i32> {
-    let n = nums.len();
-    if n == 0 {
+    if nums.is_empty() {
         return nums;
     }
+    let n = nums.len();
     _merge_sort(&mut nums, 0, n - 1);
     nums
 }
 
-pub fn _merge_sort(nums: &mut [i32], left: usize, right: usize) {
+fn _merge_sort(nums: &mut [i32], left: usize, right: usize) {
     if left >= right {
         return;
     }
-
     let mid = left + (right - left) / 2;
     _merge_sort(nums, left, mid);
     _merge_sort(nums, mid + 1, right);
@@ -19,10 +18,11 @@ pub fn _merge_sort(nums: &mut [i32], left: usize, right: usize) {
     merge(nums, left, mid, right);
 }
 
-pub fn merge(nums: &mut [i32], left: usize, mid: usize, right: usize) {
-    let (mut i, mut j, mut k) = (left, mid + 1, 0);
+fn merge(nums: &mut [i32], left: usize, mid: usize, right: usize) {
     let temp_size = right - left + 1;
     let mut temp = vec![0; temp_size];
+
+    let (mut i, mut j, mut k) = (left, mid + 1, 0);
 
     while i <= mid && j <= right {
         if nums[i] <= nums[j] {
@@ -46,8 +46,8 @@ pub fn merge(nums: &mut [i32], left: usize, mid: usize, right: usize) {
         k += 1;
     }
 
-    for i in 0..temp_size {
-        nums[left + i] = temp[i];
+    for k in 0..temp_size {
+        nums[left + k] = temp[k];
     }
 }
 

@@ -10,6 +10,7 @@ pub fn insert_sort(mut nums: Vec<i32>) -> Vec<i32> {
         }
         nums[(j + 1) as usize] = base;
     }
+
     nums
 }
 
