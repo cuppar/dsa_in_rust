@@ -17,7 +17,7 @@ pub fn select_sort(mut nums: Vec<i32>) -> Vec<i32> {
     nums
 }
 
-fn swap(nums: &mut Vec<i32>, i: usize, j: usize) {
+fn swap(nums: &mut [i32], i: usize, j: usize) {
     let n = nums.len();
     if i >= n || j >= n {
         panic!("our of index");

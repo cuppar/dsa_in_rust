@@ -4,7 +4,7 @@ pub fn quick_sort(mut nums: Vec<i32>) -> Vec<i32> {
     nums
 }
 
-fn _quick_sort(nums: &mut Vec<i32>, mut left: i32, mut right: i32) {
+fn _quick_sort(nums: &mut [i32], mut left: i32, mut right: i32) {
     while left < right {
         let pivot = partition(nums, left as usize, right as usize) as i32;
 
@@ -18,7 +18,7 @@ fn _quick_sort(nums: &mut Vec<i32>, mut left: i32, mut right: i32) {
     }
 }
 
-fn partition(nums: &mut Vec<i32>, left: usize, right: usize) -> usize {
+fn partition(nums: &mut [i32], left: usize, right: usize) -> usize {
     let mid = median_three(nums, left, left + (right - left) / 2, right);
     swap(nums, mid, left);
 
@@ -38,7 +38,7 @@ fn partition(nums: &mut Vec<i32>, left: usize, right: usize) -> usize {
     l
 }
 
-fn median_three(nums: &mut Vec<i32>, left: usize, mid: usize, right: usize) -> usize {
+fn median_three(nums: &mut [i32], left: usize, mid: usize, right: usize) -> usize {
     if (nums[left] < nums[mid]) ^ (nums[left] < nums[right]) {
         left
     } else if (nums[mid] < nums[left]) ^ (nums[mid] < nums[right]) {
@@ -48,7 +48,7 @@ fn median_three(nums: &mut Vec<i32>, left: usize, mid: usize, right: usize) -> u
     }
 }
 
-fn swap(nums: &mut Vec<i32>, i: usize, j: usize) {
+fn swap(nums: &mut [i32], i: usize, j: usize) {
     let n = nums.len();
     if i >= n || j >= n {
         panic!("our of index");
