@@ -75,7 +75,73 @@ impl Base64Encoder {
 
         String::from_utf8_lossy(result.as_slice()).to_string()
     }
-    // pub fn decode(src: &str) -> Vec<u8> {}
+
+    pub fn decode(src: &str) -> Vec<u8> {
+        let mut tail = 0;
+
+        let mut src_nums = vec![];
+        for byte in src.bytes() {
+            if byte >= b'A' && byte <= b'Z' {
+                src_nums.push(byte - b'A');
+            } else if byte >= b'a' && byte <= b'z' {
+                src_nums.push(byte - b'a' + 26);
+            } else if byte >= b'0' && byte <= b'9' {
+                src_nums.push(byte - b'0' + 52);
+            } else if byte == b'+' {
+                src_nums.push(62);
+            } else if byte == b'/' {
+                src_nums.push(63);
+            } else if byte == b'=' {
+                tail += 1;
+            }
+        }
+
+        let group = src_nums.len() / 4;
+        let mut result = vec![];
+
+        for i in 0..group {
+            let (t1, t2, t3, t4) = (
+                src_nums[i * 4],
+                src_nums[i * 4 + 1],
+                src_nums[i * 4 + 2],
+                src_nums[i * 4 + 3],
+            );
+
+            let mut u1 = t1 << 2;
+            u1 |= t2 >> 4;
+            result.push(u1);
+
+            let mut u2 = (t2 & 0x0f) << 4;
+            u2 |= t3 >> 2;
+            result.push(u2);
+
+            let mut u3 = (t3 & 0x03) << 6;
+            u3 |= t4;
+            result.push(u3);
+        }
+
+        if tail == 1 {
+            let n = src_nums.len();
+            let (t1, t2, t3) = (src_nums[n - 3], src_nums[n - 2], src_nums[n - 1]);
+
+            let mut u1 = t1 << 2;
+            u1 |= t2 >> 4;
+            result.push(u1);
+
+            let mut u2 = (t2 & 0x0f) << 4;
+            u2 |= t3 >> 2;
+            result.push(u2);
+        } else if tail == 2 {
+            let n = src_nums.len();
+            let (t1, t2) = (src_nums[n - 2], src_nums[n - 1]);
+
+            let mut u1 = t1 << 2;
+            u1 |= t2 >> 4;
+            result.push(u1);
+        }
+
+        result
+    }
 }
 
 #[cfg(test)]
@@ -88,6 +154,6 @@ mod tests {
         let target = "SGVsbG8gQmFzZTY0IQ==".to_string();
 
         assert_eq!(Base64Encoder::encode(source.as_bytes()), target);
-        // assert_eq!(Base64Encoder::decode(&target), source.as_bytes());
+        assert_eq!(Base64Encoder::decode(&target), source.as_bytes());
     }
 }
