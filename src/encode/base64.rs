@@ -8,6 +8,7 @@ impl Base64Encoder {
 
         let mut result = vec![];
 
+        
         for i in 0..group {
             let (u1, u2, u3) = (src[i * 3], src[i * 3 + 1], src[i * 3 + 2]);
             let t1 = u1 >> 2;
